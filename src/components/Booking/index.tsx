@@ -1,93 +1,151 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import CalendarTodayOutlined from '@mui/icons-material/CalendarTodayOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import { createTheme, styled, ThemeProvider } from '@mui/material/styles';
-import Calendar from '../Calender/index.tsx';
-import { Chip, Divider, Paper, Stack } from '@mui/material';
-import { useAuth } from '../../shared/hooks/AuthProvider.js';
-// import { UserContext } from '../../shared/hooks/AuthProvider.js';
+import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Typography,
+  Container,
+  Button,
+  Card,
+  CardContent,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
-
-export default function Booking() {
-  // const user = React.useContext(UserContext);
-
-  // console.log(user ,"USER CONTEXT")
-  const auth = useAuth();
-  console.log("AUTh", auth.isAuthenticated)
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
-  const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  }));
-  const handleClick = () => {
-    console.info('You clicked the Chip.');
-  };
-  return (
-      <Container component="main" maxWidth="lg" sx={{marginBottom :'10vh'}}>
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1 }}>
-            <CalendarTodayOutlined />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-           Book a slot
-          </Typography>
-   
-        </Box>
-        <CssBaseline />
-
-        <Grid container spacing={2}>
-            <Grid item xs={6}>
-                <Item>
-                    <Calendar/>
-                </Item>
-            </Grid>
-            <Grid item xs={6}>
-                <Item>
-                <Typography component="h1" variant="h6" sx = {{ color: defaultTheme.palette.text.primary}}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />  Dentistry
-          </Typography>
-                  <hr/>
-                <Stack direction="row" spacing={1}>
-                  <Chip label="8 AM - 6 PM" onClick={handleClick} />
-                </Stack>
-                    
-                </Item>
-            </Grid>    
-        </Grid>
-        
-      </Container>
-    
-  );
+// Define the type for a Shift
+interface Shift {
+  _id: string;
+  clinicName: string;
+  date: string;
+  time: string;
+  role: string;
+  status: string;
 }
+
+const Booking = () => {
+  const [shifts, setShifts] = useState<Shift[]>([]); // State to store shifts
+  const navigate = useNavigate(); // For navigation
+
+  useEffect(() => {
+    // Fetch shifts from the backend
+    const fetchShifts = async () => {
+      const token = localStorage.getItem("site");
+      if (!token) {
+        alert("Please login to view shifts.");
+        navigate("/login");
+        return;
+      }
+    
+      try {
+        console.log("Fetching shifts with token:", token);
+        const response = await fetch("/api/auth/shifts", {
+          method: "GET",
+          headers: {
+          //  "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
+    
+        // console.log("Response status:", response.status);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("API Error:", response.status, errorData);
+  throw new Error(errorData.message || "API request failed");
+          // alert(errorData.message || "Unable to fetch shifts. Please try again.");
+          return;
+        }
+    
+        const data: Shift[] = await response.json();
+        setShifts(data);
+        console.log("Fetched shifts:", data);
+      } catch (error) {
+        console.error("Error fetching shifts:", error);
+        alert(`.`);
+        
+      }
+    };
+
+    fetchShifts();
+  }, [navigate]);
+
+  const handleBookShift = async (shiftId: string) => {
+    console.log("ShiftId passed to handleBookShift:", shiftId);
+    const token = localStorage.getItem("site");
+    if (!token) {
+      alert("Please login to book a shift.");
+      navigate("/login");
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/auth/book`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+        body: JSON.stringify({ ShiftId : shiftId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error booking shift try again and again:", errorData.message || "Unknown error");
+        alert(errorData.message || "Failed to book shift. Please try again.");
+        return;
+      }
+
+      const result = await response.json();
+      alert(result.message || "Shift booked successfully!");
+
+      // Update state to remove booked shift
+      setShifts(shifts.filter((shift) => shift._id !== shiftId));
+    } catch (error) {
+      console.error("Error booking shift try again:", error);
+      alert("Failed to book shift. Please try again.");
+    }
+  };
+
+  return (
+    <Container>
+      <Typography variant="h4" align="center" sx={{ margin: 4 }}>
+        Available Shifts
+      </Typography>
+
+      <Grid container spacing={4}>
+        {shifts.length > 0 ? (
+          shifts.map((shift) => (
+            <Grid item xs={12} sm={6} md={4} key={shift._id}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Typography variant="h6">{shift.clinicName}</Typography>
+                  <Typography>
+                    Date: {new Date(shift.date).toLocaleDateString()}
+                  </Typography>
+                  <Typography>Time: {shift.time}</Typography>
+                  <Typography>Role: {shift.role}</Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    
+                    onClick={() => {
+                      console.log("Clicked ShiftId:", shift._id); // Log the ID
+                      handleBookShift(shift._id);
+                    }}
+                    fullWidth
+                    sx={{ marginTop: 2 }}
+                  >
+                    Book Shift
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="h6" align="center" sx={{ marginTop: 4 }}>
+            No shifts available
+          </Typography>
+        )}
+      </Grid>
+    </Container>
+  );
+};
+
+export default Booking;
