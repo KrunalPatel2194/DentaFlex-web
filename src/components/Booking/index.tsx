@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-// Define the type for a Shift
+
 interface Shift {
   _id: string;
   clinicName: string;
@@ -20,11 +20,11 @@ interface Shift {
 }
 
 const Booking = () => {
-  const [shifts, setShifts] = useState<Shift[]>([]); // State to store shifts
-  const navigate = useNavigate(); // For navigation
+  const [shifts, setShifts] = useState<Shift[]>([]); 
+  const navigate = useNavigate(); 
 
   useEffect(() => {
-    // Fetch shifts from the backend
+    
     const fetchShifts = async () => {
       const token = localStorage.getItem("site");
       if (!token) {
@@ -95,7 +95,7 @@ const Booking = () => {
       const result = await response.json();
       alert(result.message || "Shift booked successfully!");
 
-      // Update state to remove booked shift
+     
       setShifts(shifts.filter((shift) => shift._id !== shiftId));
     } catch (error) {
       console.error("Error booking shift try again:", error);
