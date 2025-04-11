@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import { useAuth } from '../hooks/AuthProvider';
 import { Link } from 'react-router-dom';
+import LockIcon from '@mui/icons-material/Lock';
 
 const pages = [
   { name: 'Home', path: '/' },
@@ -25,6 +26,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
   const auth = useAuth();
   
   const handleOpenNavMenu = (event) => {
@@ -43,6 +45,12 @@ function ResponsiveAppBar() {
     auth.logOut();
   };
 
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    setTooltipOpen(true);
+    setTimeout(() => setTooltipOpen(false), 3000);
+  };
+
   return (
     <AppBar position="sticky">
       <Container maxWidth="xl">
@@ -56,14 +64,14 @@ function ResponsiveAppBar() {
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
-              fontFamily: 'inherit', // Inherited font
+              fontFamily: 'inherit',
               fontWeight: 700,
               letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none',
             }}
           >
-            Denta Flex
+            DentaFlex
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -118,14 +126,14 @@ function ResponsiveAppBar() {
               mr: 2,
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
-              fontFamily: 'inherit', // Inherited font
+              fontFamily: 'inherit',
               fontWeight: 700,
               letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none',
             }}
           >
-            Denta Flex
+            DentaFlex
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
@@ -143,30 +151,36 @@ function ResponsiveAppBar() {
           </Box>
 
           {!auth.token && (
-            <Link
-              to="/login"
-              style={{
-                textDecoration: 'none',
-                color: 'white',
-                backgroundColor: '#798C77',
-                fontFamily: 'inherit', // Inherited font
-                fontWeight: 'bold',
-                padding: '8px 16px',
-                borderRadius: '4px',
-                border: '1px solid white',
-                transition: 'background-color 0.3s ease-in-out',
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = 'white';
-                e.target.style.color = '#798C77';
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#798C77';
-                e.target.style.color = 'white';
-              }}
+            <Tooltip 
+              title="Please call (226) 256-9974 to request access" 
+              open={tooltipOpen}
+              onClose={() => setTooltipOpen(false)}
+              arrow
+              placement="bottom"
             >
-              Login | Register
-            </Link>
+              <Button
+                onClick={handleLoginClick}
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: 'rgba(121, 140, 119, 0.7)',
+                  fontFamily: 'inherit',
+                  fontWeight: 'bold',
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 255, 255, 0.5)',
+                  cursor: 'default',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  '&:hover': {
+                    backgroundColor: 'rgba(121, 140, 119, 0.8)',
+                  }
+                }}
+              >
+                <LockIcon fontSize="small" />
+                Login | Register
+              </Button>
+            </Tooltip>
           )}
 
           {auth.token && (

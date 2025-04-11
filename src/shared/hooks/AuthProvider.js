@@ -11,10 +11,10 @@ const AuthProvider = ({ children }) => {
   const loginAction = async (data) => {
     try {
       // console.log("AUTH LOGIN CRED : ", data.get("email"));
-      const username= data.get('email');
+      const email= data.get('email');
       const password= data.get('password');
       const payload = {
-        username,password
+        email,password
       }
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -23,9 +23,18 @@ const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Login failed:', errorData.msg); // Log error   
+     // Check msg and status and based on that show error messages 
+  
+
+        return; // Stop execution if login fails
+    }
       const res = await response.json();
       console.log(res.token)
-      if (res) {
+      if (res.token) {
         // setUser(res.data.user);
         setToken(res.token);
         // console.log(token ,"STORED")
@@ -48,13 +57,16 @@ const AuthProvider = ({ children }) => {
   const signUpAction = async (data) => {
     try {
       // console.log("AUTH LOGIN CRED : ", data.get("email"));
-      const username= data.get('email');
-      const password= data.get('password');
+      // const username= data.get('email');
+    
       const firstName = data.get('firstName');
       const lastName = data.get('lastName');
       const email = data.get('email');
+      const password= data.get('password');
+
+     
       const payload = {
-        username, password, firstName, lastName, email
+        firstName, lastName, email,password
       }
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -66,6 +78,7 @@ const AuthProvider = ({ children }) => {
       const res = await response.json();
       // console.log(res.token)
       if (res) {
+        console.log("data send");
         // setUser(res.data.user);
         setToken(res.token);
         // console.log(token ,"STORED")

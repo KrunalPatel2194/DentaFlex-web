@@ -50,7 +50,7 @@ export default function Hero(props) {
               // alignItems: "center",
             }}
           >
-            Denta Flex
+            DentaFlex
           </Typography>
           <Typography
             variant="h6"
