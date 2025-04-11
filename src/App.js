@@ -12,7 +12,8 @@ import Booking from './components/Booking/index.tsx';
 import AuthProvider from './shared/hooks/AuthProvider.js';
 import PricingComponent from './components/Pricing/index.tsx';
 import ContactUs from './components/Contact/index.tsx';
-import ForgotPassword from './components/Resetpwd/index.tsx';
+import ForgotPassword from './components/Forgotpwd/index.tsx';
+import ResetPassword from './components/Resetpwd/index.tsx';
 import PrivacyPolicy from './components/Privacy/index.tsx';
 
 function App() {
