@@ -28,7 +28,7 @@ function Footer() {
                   textDecoration: 'none',
                 }}
               >
-                Denta Flex
+                DentaFlex
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', gap: 4 }}>
@@ -45,7 +45,7 @@ function Footer() {
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 2, borderTop: '1px solid #555', pt: 2 }}>
             <Typography variant="body2" color="white">
-              © 2024 Denta Flex. All rights reserved.
+              © 2025 Denta Flex. All rights reserved.
             </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Link href="/privacy-policy" color="inherit" sx={{ textDecoration: 'none', fontSize: '12px' }}>

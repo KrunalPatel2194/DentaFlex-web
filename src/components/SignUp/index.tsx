@@ -27,13 +27,14 @@ export default function SignUp() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // console.log({
-      const username = data.get('email');
-      const password = data.get('password');
+      
       const firstName = data.get('firstName');
       const lastName = data.get('lastName');
+      const email = data.get('email');
+      const password = data.get('password');
     // });
     try{
-      if (username !== "" && password !== "" && firstName !== "" && lastName !== "") {
+      if ( firstName !== "" && lastName !== " " && email !== "" && password !== "") {
         auth.signUpAction(data);
         return;
       }
